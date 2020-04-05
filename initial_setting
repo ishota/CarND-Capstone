@@ -5,5 +5,7 @@ pip install -r requirements.txt
 
 rm ros/src/CMakeLists.txt
 catkin_init_workspace
+cd ros
+catkin_make
 
-source ros/devel/setup.bash
+source devel/setup.bash
