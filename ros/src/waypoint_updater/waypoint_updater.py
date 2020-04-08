@@ -37,16 +37,55 @@ class WaypointUpdater(object):
         self.final_waypoints_pub = rospy.Publisher('final_waypoints', Lane, queue_size=1)
 
         # TODO: Add other member variables you need below
+        self.pose = None
+        self.waypoints_2d = None
+        self.waypoint_tree = None
+        self.loop()
 
-        rospy.spin()
+
+    def loop(self):
+        # publishing 50 Hz
+        rate = rospy.Rate(50)
+        while not rospy.is_shutdonw():
+            if self.pose and self.base_waypoints:
+                self.publish_waypoints()
+            rate.sleep()
+
+    def get_closest_waypoint_idx(self):
+        x = self.pose.pose.position.x
+        y = self.pose.pose.position.y
+
+        closest_idx = self.waypoint_tree.query([x,y], 1)[1]
+        closest_crd = self.waypoint_2d[closest_idx]
+        prev_crd = self.waypoint_2d[closest_idx - 1]
+
+        # Is closest_crd ahead or behind
+        cl_vect = np.array(closest_crd)
+        prev_vect = np.array(prev_crd)
+        pos_vect = np.array([x,y])
+
+        val = np.dot(cl_vect-prev_vect, pos_vect-cl_vect)
+        if val > 0:
+            closest_idx = (closest_idx + 1) % len(self.waypoints_2d)
+
+        return closest_idx
+
+    def publish_waypoints(self):
+        lane = Lane()
+        lane.header = self.base_waypoints.header
+        closest_idx = get_closest_waypoint_idx()
+        lane.waypoints = self.base_waypotins.waypoints[closest_idx:Closest_idx + LOOKAHEAD_WPS]
+        self.final_waypoints_pub.publish(lane)
 
     def pose_cb(self, msg):
         # TODO: Implement
         pass
 
     def waypoints_cb(self, waypoints):
-        # TODO: Implement
-        pass
+        self.base_waypoints = waypoints
+        if not self.waypoints_wd:
+            self.waypoints_2d = [[waypoint.pose.pose.position.x, waypoint.pose.pose.position.y] for waypoint in waypoints.waypoints]
+            self.waypoint_tree = KDTree(self.waypoints_2d)
 
     def traffic_cb(self, msg):
         # TODO: Callback for /traffic_waypoint message. Implement
