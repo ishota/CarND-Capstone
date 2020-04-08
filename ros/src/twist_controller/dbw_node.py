@@ -97,6 +97,10 @@ class DBWNode(object):
             if self.dbw_enabled:
                 self.publish(self.throttle, self.brake, self.steering)
             rate.sleep()
+
+    def twist_cb(self, msg):
+        self.linear_vel = msg.twist.linear.x
+        self.curr_ang_vel = msg.twist.angular.z
     
     def velocity_cb(self, msg):
         self.current_vel  = msg.twist.linear.x
