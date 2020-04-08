@@ -30,7 +30,7 @@ class Controller(object):
         self.wheel_base      = wheel_base
         self.steer_ratio     = steer_ratio
         self.max_lat_accel   = max_lat_accel
-        self.max_steer_angle = max_steer_angel
+        self.max_steer_angle = max_steer_angle
 
         # Controller
         self.yaw_controller = YawController(wheel_base, steer_ratio, 0.1, max_lat_accel, max_steer_angle)
