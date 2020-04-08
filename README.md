@@ -88,3 +88,13 @@ Specific to these libraries, the simulator grader and Carla use the following:
 | OpenMP | N/A | N/A |
 
 We are working on a fix to line up the OpenCV versions between the two.
+
+### Compiling
+
+If you get error of dbw_mkz_msgs, run the following commands
+```
+sudo apt-get update
+sudo apt-get install -y ros-kinetic-dbw-mkz-msgs
+cd /home/workspace/CarND-Capstone/ros
+rosdep install --from-paths src --ignore-src --rosdistro=kinetic -y
+```
