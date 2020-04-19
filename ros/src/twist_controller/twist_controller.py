@@ -34,7 +34,7 @@ class Controller(object):
 
         # Controller
         self.yaw_controller = YawController(wheel_base, steer_ratio, 0.1, max_lat_accel, max_steer_angle)
-        self.throttle_controller = PID(0.3, 0.1, 0.1)
+        self.throttle_controller = PID(0.3, 0.1, 0.1, 0, 0.5)
 
         # Lowpass filter
         self.vel_lpf = LowPassFilter(0.5, 0.05)
@@ -43,7 +43,7 @@ class Controller(object):
         self.last_vel = 0
         self.last_time = rospy.get_time()
 
-    def control(self, *args, **kwargs):
+    def control(self, current_vel, dbw_enabled, linear_vel, angular_vel):
         # TODO: Change the arg, kwarg list to suit your needs
 
         if not dbw_enabled:
@@ -51,7 +51,7 @@ class Controller(object):
             self.vel_lpf.reset()
             self.yaw_lpf.reset()
             return 0.,0.,0.
-        
+
         current_vel = self.vel_lpf.filt(current_vel)
 
         steering = self.yaw_controller.get_steering(linear_vel, angular_vel, current_vel)
@@ -77,4 +77,4 @@ class Controller(object):
             brake = 0
 
         # Return throttle, brake, steer
-        return 1., 0., 0.
+        return throttle, brake, steering

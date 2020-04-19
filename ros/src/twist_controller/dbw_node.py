@@ -52,7 +52,6 @@ class DBWNode(object):
                                             ThrottleCmd, queue_size=1)
         self.brake_pub = rospy.Publisher('/vehicle/brake_cmd',
                                          BrakeCmd, queue_size=1)
-
         # TODO: Create `Controller` object
         # self.controller = Controller(<Arguments you wish to provide>)
 
@@ -90,21 +89,21 @@ class DBWNode(object):
             # You should only publish the control commands if dbw is enabled
 
             if not None in (self.current_vel, self.linear_vel, self.angular_vel):
-                self.throttle, self.brake, self.steering = self.controller.control(self.current_cel,
+                self.throttle, self.brake, self.steering = self.controller.control(self.current_vel,
                                                                                    self.dbw_enabled,
                                                                                    self.linear_vel,
                                                                                    self.angular_vel)
             if self.dbw_enabled:
                 self.publish(self.throttle, self.brake, self.steering)
             rate.sleep()
-    
+
     def dbw_enabled_cb(self, msg):
         self.dbw_enabled = msg
 
     def twist_cb(self, msg):
         self.linear_vel = msg.twist.linear.x
-        self.curr_ang_vel = msg.twist.angular.z
-    
+        self.angular_vel = msg.twist.angular.z
+
     def velocity_cb(self, msg):
         self.current_vel  = msg.twist.linear.x
         self.curr_ang_vel = msg.twist.angular.z
