@@ -11,7 +11,7 @@ Done by Shota Ishikawa.
 
 Waypoint velocity calculation algorithm proposed at walkthrough is simple to implement. But it has a drawback: the car starts to brake abruptly causing high jerk that is not comfortable.
 
-On the other hand, I proposed a velocity profile using a sigmoid function to achieve a low jerk. 25 is maximum velocity(m/h).
+On the other hand, I proposed a velocity profile using a sigmoid function to achieve a low jerk. 25 is maximum velocity(m/h). A graph bellow shows x:time, y:velocity.
 ~~~python
 def sigmoid_profile(self, x):
     x = x - 12.5
