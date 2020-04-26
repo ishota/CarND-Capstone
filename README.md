@@ -74,12 +74,16 @@ def get_answer(self, rcount, ycount, gcount):
 
 ### Detected result
 
+You can see other result at tfl_imgs/result/*.
+
 ![Screencast](https://github.com/ishota/CarND-Capstone/blob/master/tfl_imgs/result/GREEN_8.png?raw=true)
-![Screencast](https://github.com/ishota/CarND-Capstone/blob/master/tfl_imgs/result/YELLOW_11.png?raw=true)
+![Screencast](https://github.com/ishota/CarND-Capstone/blob/master/tfl_imgs/result/YELLOW_39.png?raw=true)
 ![Screencast](https://github.com/ishota/CarND-Capstone/blob/master/tfl_imgs/result/RED_38.png?raw=true)
 
 ## Result
-![Screencast](https://github.com/ishota/CarND-Capstone/blob/master/gif/back.gif?raw=true)
+
+The car dtect signal and stopped at low jerk in the Udacity simulator.
+
 ![Screencast](https://github.com/ishota/CarND-Capstone/blob/master/gif/stop_line.gif?raw=true)
 
 ### Native Installation
