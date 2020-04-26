@@ -24,8 +24,7 @@ TODO (for Yousuf and Aaron): Stopline location for each traffic light.
 '''
 
 LOOKAHEAD_WPS = 200 # Number of waypoints we will publish. You can change this number
-CAR_LENGTH = 7.1
-DECEL_TIME = 5.0
+CAR_LENGTH = 5.2
 
 
 class WaypointUpdater(object):
@@ -93,27 +92,27 @@ class WaypointUpdater(object):
         way = []
         stop_idx = max(self.stopline_wp_idx - closest_idx, 0)
         stop_dist = self.distance(waypoints, 0, stop_idx) - CAR_LENGTH / 2
-        rospy.logwarn("Distance to stop line : {0:.2f} m".format(stop_dist))
 
-        # Constant Acceleration
+        # sigmoid profile acceleration
         for i, wp in enumerate(waypoints):
             p = Waypoint()
             p.pose = wp.pose
             rest_dist = stop_dist - self.distance(waypoints, 0, i)
 
             if rest_dist >= 0:
-                rospy.logwarn("rest dist: {0:.2f} m".format(rest_dist))
-                rospy.logwarn("math.sqrt(2 * 5 * rest_dist): {0:.2f} m".format(math.sqrt(2 * 5 * rest_dist)))
-                rospy.logwarn("x: {0:.2f} m".format(wp.twist.twist.linear.x))
-
-                stop_point = max(min(math.sqrt(2 * DECEL_TIME * rest_dist), wp.twist.twist.linear.x), 0)
-                rospy.logwarn("Distance to rest dist : {0:.2f} m".format(stop_point))
+                if rest_dist <= 0.15:
+                    p.twist.twist.linear.x = 0
+                stop_point = max(min(self.sigmoid_profile(rest_dist), wp.twist.twist.linear.x), 0)
                 p.twist.twist.linear.x = stop_point
             else:
                 p.twist.twist.linear.x = 0
             way.append(p)
 
         return way
+
+    def sigmoid_profile(self, x):
+        x = x - 12.5
+        return (1 / (1 + np.exp(-0.23 * x))) * 25
 
     def pose_cb(self, msg):
         # TODO: Implement
