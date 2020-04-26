@@ -2,6 +2,86 @@ This is the project repo for the final project of the Udacity Self-Driving Car N
 
 Please use **one** of the two installation options, either native **or** docker installation.
 
+
+Done by Shota Ishikawa.
+
+## Acceleration Profiles
+
+### Sigmoid Smooth Acceleration Profile
+
+Waypoint velocity calculation algorithm proposed at walkthrough is simple to implement. But it has a drawback: the car starts to brake abruptly causing high jerk that is not comfortable.
+
+On the other hand, I proposed a velocity profile using a sigmoid function to achieve a low jerk. 25 is maximum velocity(m/h).
+~~~python
+def sigmoid_profile(self, x):
+    x = x - 12.5
+    return (1 / (1 + np.exp(-0.23 * x))) * 25
+~~~
+
+![Screencast](https://github.com/ishota/CarND-Capstone/blob/master/readme_pic/sigmoid_profile.png?raw=true)
+
+## Traffic Light Detector
+
+I used Hough Circle Transform and count circles after masking signal color.
+
+1. Convert image to hsv image
+~~~python
+def convert_hsv(self, image):
+    return cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
+~~~
+
+2. Apply hue value mask
+- red_lower_mask = [(0,164,160), (10,255,255)]
+- red_upper_mask = [(170,164,160), (179,255,255)]
+- yellow_mask = [(20,160,160), (40,255,255)]
+- green_mask = [(50,164,160), (80,255,255)]
+
+~~~python
+def get_red_mask(self, hsv):
+    red_lower_mask = cv2.inRange(hsv, self.red_lower_mask[0], self.red_lower_mask[1])
+    red_upper_mask = cv2.inRange(hsv, self.red_upper_mask[0], self.red_upper_mask[1])
+    mask = red_lower_mask | red_upper_mask
+    return mask
+
+def get_yellow_mask(self, hsv):
+    return cv2.inRange(hsv, self.yellow_mask[0], self.yellow_mask[1])
+
+def get_green_mask(self, hsv):
+    return cv2.inRange(hsv, self.green_mask[0], self.green_mask[1])
+~~~
+3. FInd circles in msked image.
+I use cv2.HoughCircles function.
+
+4. Classify a signal color
+The number of circles was used as the classification criterion.
+~~~python
+def get_answer(self, rcount, ycount, gcount):
+
+    if rcount == 0 and ycount == 0 and gcount == 0:
+        return 'UNKNOWN'
+
+    if rcount > ycount and rcount > gcount:
+        return 'RED'
+
+    if ycount > rcount and ycount > gcount:
+        return 'YELLOW'
+
+    if gcount > rcount and gcount > ycount:
+        return 'GREEN'
+
+    return 'UNKNOWN'
+~~~
+
+### Detected result
+
+![Screencast](https://github.com/ishota/CarND-Capstone/blob/master/tfl_imgs/result/GREEN_8.png?raw=true)
+![Screencast](https://github.com/ishota/CarND-Capstone/blob/master/tfl_imgs/result/YELLOW_11.png?raw=true)
+![Screencast](https://github.com/ishota/CarND-Capstone/blob/master/tfl_imgs/result/RED_38.png?raw=true)
+
+## Result
+![Screencast](https://github.com/ishota/CarND-Capstone/blob/master/gif/back.gif?raw=true)
+![Screencast](https://github.com/ishota/CarND-Capstone/blob/master/gif/stop_line.gif?raw=true)
+
 ### Native Installation
 
 * Be sure that your workstation is running Ubuntu 16.04 Xenial Xerus or Ubuntu 14.04 Trusty Tahir. [Ubuntu downloads can be found here](https://www.ubuntu.com/download/desktop).
